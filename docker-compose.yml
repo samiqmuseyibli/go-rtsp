@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  go-rtsp-streamer:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./streams:/app/streams
+    environment:
+      - PORT=8080
+      - STREAM_DIR=/app/streams
+      - CLEANUP_DELAY_SECONDS=30
+      - HLS_SEGMENT_TIME=2
+      - HLS_LIST_SIZE=5
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./streams:/usr/share/nginx/html/streams
+    depends_on:
+      - go-rtsp-streamer
+    restart: unless-stopped
