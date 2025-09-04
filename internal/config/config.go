@@ -26,7 +26,7 @@ func New() *Config {
 	listSize, _ := strconv.Atoi(getEnv("HLS_LIST_SIZE", "5"))
 
 	config := &Config{
-		StreamDir:      getEnv("STREAM_DIR", "./streams"),
+		StreamDir:      getEnv("STREAM_DIR", "../streams"),
 		CleanupDelay:   time.Duration(cleanupDelay) * time.Second,
 		HLSSegmentTime: segmentTime,
 		HLSListSize:    listSize,

@@ -53,7 +53,7 @@ func (m *Manager) StartStream(indicatorID, rtspLink string) (string, error) {
 
 	streamDir := filepath.Join(m.config.StreamDir, indicatorID)
 	if err := os.MkdirAll(streamDir, 0755); err != nil {
-		return "", fmt.Errorf("failed to create stream directory: %v", err)
+		return "", fmt.Errorf("failed to create stream directory(%v): %v", streamDir, err)
 	}
 
 	streamPath := fmt.Sprintf("/streams/%s/stream.m3u8", indicatorID)
