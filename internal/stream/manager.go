@@ -35,7 +35,7 @@ func NewManager(cfg *config.Config) *Manager {
 	}
 
 	if err := os.MkdirAll(cfg.StreamDir, 0755); err != nil {
-		panic(fmt.Sprintf("Failed to create streams directory: %v", err))
+		panic(fmt.Sprintf("Failed to create streams directory(%v): %v", cfg.StreamDir, err))
 	}
 
 	go m.cleanupWorker()
