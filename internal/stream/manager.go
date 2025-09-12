@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"crypto/md5"
 	"fmt"
 	"log"
 	"os"
@@ -42,6 +43,12 @@ func NewManager(cfg *config.Config) *Manager {
 	return m
 }
 
+// hashIndicator deterministically returns the hex MD5 hash of the provided indicatorID.
+func hashIndicator(indicatorID string) string {
+    sum := md5.Sum([]byte(indicatorID))
+    return fmt.Sprintf("%x", sum)
+}
+
 func (m *Manager) StartStream(indicatorID, rtspLink string) (string, error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
@@ -51,12 +58,13 @@ func (m *Manager) StartStream(indicatorID, rtspLink string) (string, error) {
 		return stream.StreamPath, nil
 	}
 
-	streamDir := filepath.Join(m.config.StreamDir, indicatorID)
+	hashedID := hashIndicator(indicatorID)
+	streamDir := filepath.Join(m.config.StreamDir, hashedID)
 	if err := os.MkdirAll(streamDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create stream directory(%v): %v", streamDir, err)
 	}
 
-	streamPath := fmt.Sprintf("/streams/%s/stream.m3u8", indicatorID)
+	streamPath := fmt.Sprintf("/streams/%s/stream.m3u8", hashedID)
 	outputPath := filepath.Join(streamDir, "stream.m3u8")
 
 	cmd := exec.Command("ffmpeg",
@@ -204,6 +212,7 @@ func (m *Manager) cleanupWorker() {
 }
 
 func (m *Manager) cleanupStreamFiles(indicatorID string) {
-	streamDir := filepath.Join(m.config.StreamDir, indicatorID)
+	hashedID := hashIndicator(indicatorID)
+	streamDir := filepath.Join(m.config.StreamDir, hashedID)
 	os.RemoveAll(streamDir)
 }
